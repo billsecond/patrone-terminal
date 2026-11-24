@@ -2,19 +2,19 @@
 # Builds Patrone Terminal and installs it for the current user, so it can be
 # tried in the dev VM's GNOME session before it's packaged. No sudo needed.
 #
-#   ./terminal/install-dev.sh            install the app and its launcher entry
-#   ./terminal/install-dev.sh --default  also make it GNOME's terminal in place of
+#   ./install-dev.sh            install the app and its launcher entry
+#   ./install-dev.sh --default  also make it GNOME's terminal in place of
 #                                        Ubuntu's (Ptyxis), for this user only
-#   ./terminal/install-dev.sh --autostart  also open it whenever you log in
-#   ./terminal/install-dev.sh --bashrc   also give bash Patrone's prompt
-#   ./terminal/install-dev.sh --zshrc    also install Patrone's zshrc as ~/.zshrc
+#   ./install-dev.sh --autostart  also open it whenever you log in
+#   ./install-dev.sh --bashrc   also give bash Patrone's prompt
+#   ./install-dev.sh --zshrc    also install Patrone's zshrc as ~/.zshrc
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
 # Patrone's shell setup, for --bashrc and --zshrc: a clone of
 # billsecond/patrone-shell-config, beside this repository's clone unless
 # PATRONE_SHELL_CONFIG says where
-config=${PATRONE_SHELL_CONFIG:-$here/../../patrone-shell-config}
+config=${PATRONE_SHELL_CONFIG:-$here/../patrone-shell-config}
 make_default=false
 autostart=false
 install_bashrc=false

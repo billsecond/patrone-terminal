@@ -10,7 +10,9 @@ Build-Depends: debhelper-compat (= 13),
                pkgconf
 Standards-Version: 4.7.0
 Rules-Requires-Root: no
-Vcs-Git: https://github.com/billsecond/patroneos.git
+Vcs-Git: https://github.com/billsecond/patrone-terminal.git
+Vcs-Browser: https://github.com/billsecond/patrone-terminal
+Homepage: https://github.com/billsecond/patrone-terminal
 
 Package: patrone-terminal
 Architecture: any

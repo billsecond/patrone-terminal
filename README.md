@@ -57,23 +57,43 @@ All windows normally share one process: running `patrone-terminal` again
 opens a window in the one already running. `--standalone` (`-s`) starts a
 separate process, for example inside a nested compositor.
 
+## Installing
+
+- **PatroneOS** has it already.
+- **Ubuntu 26.04 and systems built on it:** from Patrone's apt
+  repository, which keeps it up to date
+  ([billsecond/patrone-apt](https://github.com/billsecond/patrone-apt),
+  "Patrone's apps on Ubuntu"), then `sudo apt install patrone-terminal`. Or
+  download the `.deb` from the
+  [latest release](https://github.com/billsecond/patrone-terminal/releases/latest)
+  and open it.
+  Installed on its own it opens only when it's asked for (its sign-in
+  autostart is PatroneOS's taskbar's), and it doesn't become the terminal
+  other programs open.
+
+Its history up to here is from PatroneOS's repository,
+[billsecond/patroneos](https://github.com/billsecond/patroneos), where it
+lived in its own folder; pull request numbers in those commits are that
+repository's, and so are paths below such as `docs/`, `desktop/`,
+`shell/gnome/` and `scripts/`.
+
 ## Build and try it
 
 On the dev VM (the libraries come from `scripts/bootstrap-dev-vm.sh`):
 
 ```
-cargo run --manifest-path terminal/Cargo.toml
-cargo test --manifest-path terminal/Cargo.toml
+cargo run
+cargo test
 ```
 
 To install it for your user, with a launcher entry and icon in GNOME:
 
 ```
-./terminal/install-dev.sh             # the app
-./terminal/install-dev.sh --default   # and use it instead of Ubuntu's terminal
-./terminal/install-dev.sh --autostart # and open it whenever you log in
-./terminal/install-dev.sh --bashrc    # and give bash Patrone's prompt
-./terminal/install-dev.sh --zshrc     # and use Patrone's zshrc and zprofile
+./install-dev.sh             # the app
+./install-dev.sh --default   # and use it instead of Ubuntu's terminal
+./install-dev.sh --autostart # and open it whenever you log in
+./install-dev.sh --bashrc    # and give bash Patrone's prompt (needs a clone of patrone-shell-config beside this one)
+./install-dev.sh --zshrc     # and use Patrone's zshrc and zprofile
 ```
 
 This copy is in the account (`~/.local/bin/patrone-terminal`, with its own
@@ -101,8 +121,8 @@ asked for. GNOME's login screen
 doesn't run autostart entries, and a Patrone Desktop session opens its own
 terminal from the compositor.
 
-The package is built with `packaging/build.sh patrone-terminal` (see
-`packaging/README.md`). The crate keeps `rust-version` at Ubuntu's rustc
+The package is built with `tools/build-deb.sh`, into `out/` (`-d` to skip
+the Build-Depends check, with Rust from rustup). The crate keeps `rust-version` at Ubuntu's rustc
 (1.93), which builds the package.
 
 To try it without touching a desktop session, GTK's Broadway backend draws it
@@ -151,3 +171,12 @@ plus completion menus, shared history, `zsh-autosuggestions` and
 `zsh-syntax-highlighting`, and its `zprofile` makes login shells read
 `~/.profile`, where Ubuntu keeps PATH additions such as `~/.local/bin`. To
 switch: `chsh -s /usr/bin/zsh`; to switch back: `chsh -s /bin/bash`.
+
+## Releases
+
+A tag `vVERSION`, where VERSION is `debian/changelog`'s, makes a GitHub
+release (`.github/workflows/release.yml`): the `.deb`, built in a clean
+Ubuntu 26.04 container, the source tarball (`git archive` of the tag) and
+`SHA256SUMS`. PatroneOS builds its own package from that tarball: its
+repository pins the release in `packaging/patrone-terminal/release.txt`, and moving
+the pin on its `main` publishes it to Patrone's apt repository.
