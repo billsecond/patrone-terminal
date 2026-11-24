@@ -70,6 +70,20 @@ separate process, for example inside a nested compositor.
   Installed on its own it opens only when it's asked for (its sign-in
   autostart is PatroneOS's taskbar's), and it doesn't become the terminal
   other programs open.
+- **Any Linux, as a Flatpak**, with PatroneOS's fonts in it and kept up to
+  date: from Patrone's app index (with Flathub, for the GNOME runtime it
+  runs on):
+
+  ```
+  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  flatpak remote-add --if-not-exists patrone-app-index https://billsecond.github.io/patrone-app-index/patrone-app-index.flatpakrepo
+  flatpak install patrone-app-index org.patrone.Terminal
+  ```
+
+  The Flatpak runs the computer's own shell and programs, through
+  `flatpak-spawn --host`. From its sandbox it can't see what's running in
+  a tab, so it doesn't ask before closing one where a program is still
+  running, and Escape goes to the program in front.
 
 Its history up to here is from PatroneOS's repository,
 [billsecond/patroneos](https://github.com/billsecond/patroneos), where it
@@ -172,11 +186,26 @@ plus completion menus, shared history, `zsh-autosuggestions` and
 `~/.profile`, where Ubuntu keeps PATH additions such as `~/.local/bin`. To
 switch: `chsh -s /usr/bin/zsh`; to switch back: `chsh -s /bin/bash`.
 
+## Flatpak
+
+`tools/build-flatpak.sh` builds `flatpak/org.patrone.Terminal.yml` on the
+GNOME 50 runtime (its VTE), with the crates vendored and PatroneOS's
+fonts (`fonts-release.txt`) in `/app/share/fonts`, into `out/`: the bundle
+and a tarball of the same app's files, which Patrone's app index has
+Flatpak download. In it, `spawn` runs the shell with `flatpak-spawn --host`
+(`on_host` in `src/window.rs`), with TERM, COLORTERM and VTE_VERSION, and
+the starting folder as `--directory`; the login shell comes from the
+computer's password database. The GNOME runtime has no VTE for GTK 4, so the
+Flatpak builds VTE 0.84.0 (LGPL-3.0-or-later) from GNOME's release tarball,
+whose address and checksum the manifest pins; flatpak-builder puts its
+licences in `/app/share/licenses`. `.github/workflows/flatpak.yml` builds it,
+installs it and runs a command through it (`tools/test-flatpak.sh`).
+
 ## Releases
 
 A tag `vVERSION`, where VERSION is `debian/changelog`'s, makes a GitHub
 release (`.github/workflows/release.yml`): the `.deb`, built in a clean
-Ubuntu 26.04 container, the source tarball (`git archive` of the tag) and
-`SHA256SUMS`. PatroneOS builds its own package from that tarball: its
+Ubuntu 26.04 container, the source tarball (`git archive` of the tag), the
+Flatpak bundle and its tarball, and `SHA256SUMS`. PatroneOS builds its own package from that tarball: its
 repository pins the release in `packaging/patrone-terminal/release.txt`, and moving
 the pin on its `main` publishes it to Patrone's apt repository.

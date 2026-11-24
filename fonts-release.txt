@@ -1,0 +1,10 @@
+# A copy of PatroneOS's fonts/release.txt (billsecond/patroneos): the
+# release of billsecond/patroneos-fonts that the Flatpak bundles. Keep
+# it the same as PatroneOS's, which fonts-patroneos installs.
+# The fonts fonts-patroneos installs: a release of PatroneOS's fonts,
+# https://github.com/billsecond/patroneos-fonts, pinned by its checksum.
+# packaging/build.sh fetches it and checks it before the package is built,
+# so the build itself runs offline.
+version=1.1.0
+url=https://github.com/billsecond/patroneos-fonts/releases/download/v1.1.0/PatroneOS-Fonts-1.1.0.zip
+sha256=91c95bd43934c54be614f45a85ac7efaa89adb537f7e377b3050651f4e57bf4b

@@ -1,3 +1,14 @@
+patrone-terminal (0.1.12) resolute; urgency=medium
+
+  * A Flatpak too, for any Linux (flatpak/org.patrone.Terminal.yml,
+    tools/build-flatpak.sh), with PatroneOS's fonts in it; it runs the
+    computer's own shell through flatpak-spawn --host. Each release has
+    the bundle, and Patrone's app index lists it.
+  * An AppStream listing (org.patrone.Terminal.metainfo.xml), for GNOME
+    Software and the app index.
+
+ -- William Daugherty <31995458+billsecond@users.noreply.github.com>  Tue, 24 Nov 2026 09:00:00 -0600
+
 patrone-terminal (0.1.11) resolute; urgency=medium
 
   * Built from its own repository, billsecond/patrone-terminal,
