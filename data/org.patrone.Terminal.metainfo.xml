@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Patrone Terminal's listing: GNOME Software (and Patrone Software) show
+     it, and Patrone's app index reads it from the Flatpak. -->
+<component type="desktop-application">
+  <id>org.patrone.Terminal</id>
+  <name>Patrone Terminal</name>
+  <summary>A terminal with tabs, copy on select and paste on right-click</summary>
+  <developer id="com.patroneos">
+    <name>William Daugherty</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>
+      Patrone Terminal is PatroneOS's terminal, built on GTK 4 and VTE.
+      Selecting text copies it, a right-click pastes, and Ctrl+click opens
+      links. Escape clears the command line at the shell's prompt.
+    </p>
+    <ul>
+      <li>Tabs, and 100,000 lines of scrollback</li>
+      <li>PatroneOS Mono, or a font of your choice, and a see-through background</li>
+      <li>Asks before closing a tab where a program is still running</li>
+    </ul>
+    <p>
+      As a Flatpak it runs the computer's own shell and programs, so it
+      works like any terminal there.
+    </p>
+  </description>
+  <launchable type="desktop-id">org.patrone.Terminal.desktop</launchable>
+  <url type="homepage">https://github.com/billsecond/patrone-terminal</url>
+  <url type="bugtracker">https://github.com/billsecond/patrone-terminal/issues</url>
+  <url type="vcs-browser">https://github.com/billsecond/patrone-terminal</url>
+  <provides>
+    <binary>patrone-terminal</binary>
+  </provides>
+  <categories>
+    <category>System</category>
+    <category>TerminalEmulator</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.12" date="2026-11-24">
+      <description>
+        <p>Patrone Terminal as a Flatpak, for any Linux, running the computer's own shell.</p>
+      </description>
+    </release>
+    <release version="0.1.11" date="2026-11-24">
+      <description>
+        <p>Built from its own repository.</p>
+      </description>
+    </release>
+  </releases>
+</component>

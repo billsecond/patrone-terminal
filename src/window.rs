@@ -249,10 +249,15 @@ pub fn apply_settings_everywhere(app: &gtk::Application) {
 }
 
 fn spawn(terminal: &vte::Terminal, launch: &Launch) {
-    let argv = launch.command.clone().unwrap_or_else(|| vec![user_shell()]);
+    let mut argv = launch.command.clone().unwrap_or_else(|| vec![user_shell()]);
+    let mut working_directory = launch.working_directory.as_deref().and_then(Path::to_str);
+    let program = argv[0].clone();
+    if sandboxed() {
+        argv = on_host(argv, working_directory);
+        // The folder is the computer's, which the sandbox may not see
+        working_directory = None;
+    }
     let argv: Vec<&str> = argv.iter().map(String::as_str).collect();
-    let program = argv[0].to_owned();
-    let working_directory = launch.working_directory.as_deref().and_then(Path::to_str);
     terminal.spawn_async(
         vte::PtyFlags::DEFAULT,
         working_directory,
@@ -274,9 +279,49 @@ fn spawn(terminal: &vte::Terminal, launch: &Launch) {
     );
 }
 
+/// Whether the terminal runs as a Flatpak (from Patrone's app index). Its
+/// shell and programs are the computer's then, not the sandbox's, run with
+/// `flatpak-spawn --host` on the terminal's PTY (on_host). From the sandbox
+/// the shell's processes can't be seen, so the checks that look at them
+/// (a program still running when a tab closes, Escape clearing the prompt)
+/// find nothing and stay out of the way.
+fn sandboxed() -> bool {
+    static SANDBOXED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SANDBOXED.get_or_init(|| Path::new("/.flatpak-info").exists())
+}
+
+/// A command line run on the computer through flatpak-spawn, in the folder
+/// given. VTE's own variables are given to it, as VTE gives them to a
+/// program it starts itself: TERM and COLORTERM for colors, VTE_VERSION for
+/// the shell's vte.sh, which tells the terminal the current folder.
+fn on_host(argv: Vec<String>, folder: Option<&str>) -> Vec<String> {
+    // SAFETY: these only return the library's version numbers.
+    let version = unsafe {
+        vte::ffi::vte_get_major_version() * 10000
+            + vte::ffi::vte_get_minor_version() * 100
+            + vte::ffi::vte_get_micro_version()
+    };
+    let mut host = vec![
+        "flatpak-spawn".to_owned(),
+        "--host".to_owned(),
+        "--watch-bus".to_owned(),
+        "--env=TERM=xterm-256color".to_owned(),
+        "--env=COLORTERM=truecolor".to_owned(),
+        format!("--env=VTE_VERSION={version}"),
+    ];
+    if let Some(folder) = folder {
+        host.push(format!("--directory={folder}"));
+    }
+    host.extend(argv);
+    host
+}
+
 /// The login shell from the password database, which stays current after
-/// `chsh`, unlike `$SHELL`.
+/// `chsh`, unlike `$SHELL`: the computer's, in the Flatpak.
 fn user_shell() -> String {
+    if sandboxed() {
+        return host_shell().unwrap_or_else(|| "/bin/bash".to_owned());
+    }
     // SAFETY: returns a newly allocated string, or NULL.
     let shell: Option<glib::GString> =
         unsafe { glib::translate::from_glib_full(vte::ffi::vte_get_user_shell()) };
@@ -284,6 +329,19 @@ fn user_shell() -> String {
         .map(String::from)
         .or_else(|| std::env::var("SHELL").ok())
         .unwrap_or_else(|| "/bin/sh".to_owned())
+}
+
+/// The account's login shell in the computer's password database.
+fn host_shell() -> Option<String> {
+    // SAFETY: getuid can't fail.
+    let uid = unsafe { libc::getuid() };
+    let output = std::process::Command::new("flatpak-spawn")
+        .args(["--host", "getent", "passwd", &uid.to_string()])
+        .output()
+        .ok()?;
+    let line = String::from_utf8_lossy(&output.stdout);
+    let shell = line.trim_end().rsplit(':').next()?.to_owned();
+    (output.status.success() && shell.starts_with('/')).then_some(shell)
 }
 
 fn copy_on_select(terminal: &vte::Terminal) {

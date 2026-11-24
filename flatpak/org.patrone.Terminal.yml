@@ -1,0 +1,51 @@
+# Patrone Terminal's Flatpak. tools/build-flatpak.sh builds it: it puts the
+# source (with its crates vendored, so the build runs offline) in src/
+# beside a copy of this file, and the fonts' address and checksum from
+# fonts-release.txt in place of @FONTS_URL@ and @FONTS_SHA256@.
+#
+# The terminal runs the computer's own shell, not the sandbox's: through
+# flatpak-spawn --host (so it needs org.freedesktop.Flatpak), on its PTY.
+id: org.patrone.Terminal
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: patrone-terminal
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # The shell, and everything run in it, on the computer
+  - --talk-name=org.freedesktop.Flatpak
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+modules:
+  # PatroneOS's fonts: PatroneOS Mono is the terminal's font
+  - name: patroneos-fonts
+    buildsystem: simple
+    build-commands:
+      - find . -name 'PatroneOS*.ttf' -exec install -Dm644 -t /app/share/fonts/patroneos {} +
+      - find . \( -name OFL.txt -o -name FONTLOG.txt \) -exec install -Dm644 -t /app/share/fonts/patroneos {} +
+    sources:
+      - type: archive
+        url: '@FONTS_URL@'
+        sha256: '@FONTS_SHA256@'
+
+  - name: patrone-terminal
+    buildsystem: simple
+    build-options:
+      env:
+        CARGO_HOME: /run/build/patrone-terminal/cargo
+    build-commands:
+      - cargo build --release --frozen
+      - install -Dm755 target/release/patrone-terminal /app/bin/patrone-terminal
+      - install -Dm644 -t /app/share/applications data/org.patrone.Terminal.desktop
+      - install -Dm644 -t /app/share/icons/hicolor/scalable/apps data/org.patrone.Terminal.svg
+      - install -Dm644 -t /app/share/metainfo data/org.patrone.Terminal.metainfo.xml
+      - gzip -9n < third-party-licenses.txt > third-party-licenses.txt.gz
+      - install -Dm644 -t /app/share/doc/patrone-terminal LICENSE third-party-licenses.txt.gz
+    sources:
+      - type: dir
+        path: src
