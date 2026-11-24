@@ -195,7 +195,10 @@ and a tarball of the same app's files, which Patrone's app index has
 Flatpak download. In it, `spawn` runs the shell with `flatpak-spawn --host`
 (`on_host` in `src/window.rs`), with TERM, COLORTERM and VTE_VERSION, and
 the starting folder as `--directory`; the login shell comes from the
-computer's password database. `.github/workflows/flatpak.yml` builds it,
+computer's password database. The GNOME runtime has no VTE for GTK 4, so the
+Flatpak builds VTE 0.84.0 (LGPL-3.0-or-later) from GNOME's release tarball,
+whose address and checksum the manifest pins; its licences are in
+`/app/share/licenses/vte`. `.github/workflows/flatpak.yml` builds it,
 installs it and runs a command through it (`tools/test-flatpak.sh`).
 
 ## Releases
