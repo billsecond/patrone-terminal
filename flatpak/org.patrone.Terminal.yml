@@ -33,6 +33,30 @@ modules:
         url: '@FONTS_URL@'
         sha256: '@FONTS_SHA256@'
 
+  # VTE for GTK 4, which the GNOME runtime doesn't have: the version Ubuntu
+  # 26.04 has, which the vte4 crate's v0_84 feature asks for. GNOME's
+  # release tarball has its subprojects (fast_float, fmt, simdutf) in it,
+  # so it builds offline.
+  - name: vte
+    buildsystem: meson
+    config-opts:
+      - -Dgtk3=false
+      - -Dgtk4=true
+      - -Dgir=false
+      - -Dvapi=false
+      - -Dglade=false
+      - -Ddocs=false
+      - -Dapp=false
+      - -D_systemd=false
+      - --wrap-mode=nodownload
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/vte/0.84/vte-0.84.0.tar.xz
+        sha256: 0414e31583836aeb7878da25f67c515f7e8879917ecc37c92e26b83e8d8fc3e3
+
   - name: patrone-terminal
     buildsystem: simple
     build-options:
