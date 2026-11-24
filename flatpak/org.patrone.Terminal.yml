@@ -53,9 +53,8 @@ modules:
       - /include
       - /lib/pkgconfig
     # Its licences (LGPL-3.0-or-later, with GPL-3 and the others
-    # COPYING.README names), beside the app's
-    post-install:
-      - install -Dm644 -t /app/share/licenses/vte COPYING.README COPYING.LGPL3 COPYING.GPL3 COPYING.CC-BY-4-0 COPYING.XTERM
+    # COPYING.README names): flatpak-builder records its COPYING files in
+    # /app/share/licenses by itself
     sources:
       - type: archive
         url: https://download.gnome.org/sources/vte/0.84/vte-0.84.0.tar.xz

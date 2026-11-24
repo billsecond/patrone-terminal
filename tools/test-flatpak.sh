@@ -15,4 +15,6 @@ grep -q 'ID=ubuntu' "$out"
 [[ $(flatpak run --command=fc-list "$id" | grep -c PatroneOS) -gt 0 ]]
 flatpak run --command=ls "$id" /app/share/doc/patrone-terminal/third-party-licenses.txt.gz \
     /app/share/metainfo/org.patrone.Terminal.metainfo.xml
+# VTE's licences, which flatpak-builder records
+flatpak run --command=sh "$id" -c 'find /app/share/licenses -name "COPYING.LGPL3*" | grep .'
 echo "The Flatpak runs the computer's shell, with its fonts and licences."

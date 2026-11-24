@@ -197,8 +197,8 @@ Flatpak download. In it, `spawn` runs the shell with `flatpak-spawn --host`
 the starting folder as `--directory`; the login shell comes from the
 computer's password database. The GNOME runtime has no VTE for GTK 4, so the
 Flatpak builds VTE 0.84.0 (LGPL-3.0-or-later) from GNOME's release tarball,
-whose address and checksum the manifest pins; its licences are in
-`/app/share/licenses/vte`. `.github/workflows/flatpak.yml` builds it,
+whose address and checksum the manifest pins; flatpak-builder puts its
+licences in `/app/share/licenses`. `.github/workflows/flatpak.yml` builds it,
 installs it and runs a command through it (`tools/test-flatpak.sh`).
 
 ## Releases
